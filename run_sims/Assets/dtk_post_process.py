@@ -179,8 +179,8 @@ def compare_incidence_magude(sim_start_year):
     for i in range(sim_duration_years):
         month += day_to_month
 
-    sim_data = pd.DataFrame({'year': year,
-                             'month': month,
+    sim_data = pd.DataFrame({'year': year[:-1], # omit the last year and month value since Emod no longer reports it.
+                             'month': month[:-1],
                              'cases': cases})
     # Aggregate by month:
     sim_data = sim_data.groupby(['year', 'month']).agg({"cases": "sum"}).reset_index()

@@ -16,7 +16,7 @@ class TestWorkflowFromCommandLine(unittest.TestCase):
     def test_2_run_script(self):
         result = subprocess.run(["python3", "../run_sims/run_from_command_line.py",
                                  "-i", "emod_output/emod_exp_test.id", "-a", "test",
-                                 "-p", "1", "-r", "30", "-t", "0.05", "-m", "3", "-s", "1"], capture_output=True, text=True)
+                                 "-p", "1", "-r", "30", "-t", "0.05", "0.1", "-m", "3", "-s", "1"], capture_output=True, text=True)
         if result.returncode:
             print(result.stderr)
         self.assertEqual(result.returncode, 0)  # Check if the script ran successfully

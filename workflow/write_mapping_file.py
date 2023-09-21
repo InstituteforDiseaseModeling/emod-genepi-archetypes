@@ -1,12 +1,15 @@
 import os
 import argparse
+import shutil
+
 import pandas as pd
 from operator import itemgetter
 
 from run_sims import manifest
 
 
-def write_mapping_file(output_filepath: list, first_only: bool = False, mapping_filepath: str = None) -> list:
+def write_mapping_file(output_filepath: list, first_only: bool = False, mapping_filepath: str = None,
+                       mapping_filder_folder: str = None) -> list:
     """
     Write mapping file for Emod outputs.
     Args:
@@ -32,13 +35,18 @@ def write_mapping_file(output_filepath: list, first_only: bool = False, mapping_
             sim_map[sim][2] = True
 
         if sim_map[sim][1] is True and sim_map[sim][2] is True:
-            mapping_df = pd.DataFrame({"output_name": "emod_file",
+            mapping_df = pd.DataFrame({"output_name": f"emod_file_{sim}",
                                        # transmission file
                                        "full_path": os.path.join(directory, manifest.transmission_report),
                                        # infection file
                                        "infection_path": os.path.join(directory, manifest.infection_report)},
                                       index=[0])
             mapping_df.to_csv(sim_map[sim][0], index=False)
+            if mapping_filder_folder:
+                if not os.path.isdir(mapping_filder_folder):
+                    os.mkdir(mapping_filder_folder)
+                print(f"moving {sim_map[sim][0]} to {os.path.join(mapping_filder_folder, sim+'_mapping_file.csv')}")
+                shutil.copyfile(sim_map[sim][0], os.path.join(mapping_filder_folder, f"{sim}_mapping_file.csv"))
             if first_only:
                 print(f'We only need first simulation, writing to mapping file: {mapping_filepath}.')
                 mapping_df.to_csv(mapping_filepath, index=False)
@@ -75,7 +83,9 @@ if __name__ == "__main__":
                         action='store_true')
     parser.add_argument('--mapping_filepath', '-m', type=str, help='mapping filepaths',
                         default=None)
+    parser.add_argument('--mapping_file_folder', '-d', type=str, help='mapping file folder',
+                        default=None)
     args = parser.parse_args()
     print('running with:')
-    print(args.output_filepath, args.first_only, args.mapping_filepath)
-    write_mapping_file(args.output_filepath, args.first_only, args.mapping_filepath)
+    print(args.output_filepath, args.first_only, args.mapping_filepath, args.mapping_file_folder)
+    write_mapping_file(args.output_filepath, args.first_only, args.mapping_filepath, args.mapping_file_folder)

@@ -6,10 +6,10 @@ from run_sims.create_sim_sweeps import create_and_run_sim_sweep
 
 class NullableFloatListAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
-        if values.lower() == "none":
+        if any(str(item).lower() == "none" for item in values): # values.lower() == "none":
             setattr(namespace, self.dest, None)
         else:
-            float_list = [float(item) for item in values.split(",")]
+            float_list = [float(item) for item in values]
             setattr(namespace, self.dest, float_list)
 
 
@@ -29,7 +29,7 @@ def main():
     parser.add_argument('--importations_per_year_per_1000', '-r', nargs='+', type=int,
                         help='list of values for importation rate per 1000 people in population (default to [50])',
                         default=[50])
-    parser.add_argument('--target_prevalences', '-t', type=str,
+    parser.add_argument('--target_prevalences', '-t', nargs='+', type=str,
                         help='list of values for target (RDT) prevalence for test/flat/maka_like/magude_like scenarios'
                              ' (possible values are 5%%, 10%%, 20%%, 30%%, 40%%, default to [0.05])',
                         default=[0.05], action=NullableFloatListAction)
